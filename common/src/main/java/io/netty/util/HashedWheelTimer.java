@@ -686,7 +686,13 @@ public class HashedWheelTimer implements Timer {
             }
 
             // run timeout task at separate thread to avoid the worker thread blocking
-            TIMER_TASK_EXECUTOR.execute(new TimeoutTaskRunnable(this));
+            try {
+                TIMER_TASK_EXECUTOR.execute(new TimeoutTaskRunnable(this));
+            } catch (Throwable t) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn("An exception was thrown by " + ExecutorService.class.getSimpleName() + '.', t);
+                }
+            }
         }
 
         @Override
